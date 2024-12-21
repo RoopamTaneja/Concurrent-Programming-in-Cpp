@@ -13,17 +13,18 @@ namespace lock_free
         {
             T t;
             std::shared_ptr<Node> next;
+            Node(T elem, std::shared_ptr<Node> ptr) : t{std::move(elem)}, next{std::move(ptr)} {}
         };
         std::atomic<std::shared_ptr<Node>> head;
 
-        void push_front(T t)
+        void push(T t)
         {
             auto p = make_shared<Node>(std::move(t), head.load());
             while (!head.compare_exchange_weak(p->next, p))
                 ;
         }
 
-        std::optional<T> pop_front()
+        std::optional<T> pop()
         {
             auto p = head.load();
             while (p != nullptr && !head.compare_exchange_weak(p, p->next))
