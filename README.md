@@ -1,4 +1,4 @@
-## Concurrent-Programming-in-Cpp
+## Concurrent Programming in C++
 
 An attempt to explore and learn about concurrent (and lock-free in particular) programming, especially in C++.
 
