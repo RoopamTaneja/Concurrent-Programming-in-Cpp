@@ -162,8 +162,8 @@ It tries to take the deferred reclamation idea and combine with a RAII shared-ow
 
     retire (x) : Decrement ref count of x when it's not protected
 
-And internally hazard pointers, RCU etc can be used to implement protect or retire. Also we add a get_snapshot() method allowing us to read without incrementing the ref count.
+And internally hazard pointers, RCU etc can be used to implement protect or retire. Also we add a get_snapshot() method allowing us to read by eliding ref count increments.
 
-And why it excites us is due to the fact that std::atomic< shared_ptr > (even if lock-free) would behave much worse than deferred reclamation techniques on *read-heavy workloads* particulary and also on other workloads. But by loosening standard API restrictions of how an atomic shared ptr needs to behave, we can combine best of both worlds and achieve much better performance along with the simple interface of atomic shared ptrs, as demonstrated by Daniel in his talk.
+And why it excites us is due to the fact that std::atomic< shared_ptr > (even if lock-free) would behave much worse than manual memory reclamation techniques on *read-heavy workloads* particulary and also on other workloads. But by loosening standard API restrictions of how an atomic shared ptr needs to behave, we can combine best of both worlds and achieve much better performance along with the simple interface of atomic shared ptrs, as demonstrated by Daniel in his talk.
 
 ---

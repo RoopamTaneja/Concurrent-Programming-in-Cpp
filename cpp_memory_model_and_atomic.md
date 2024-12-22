@@ -8,7 +8,11 @@ If a program is lock-free, it basically means that at least one of its threads i
 
 *A spinlock is nonblocking but not lock-free.*
 
-Wait-free is a stronger condition which means that every thread is guaranteed to make progress in a bounded amount of time. No starvation essentially. Threads need to collaborate to allow each other to complete their operations. DUe to this algorithm is likely to be more complex.
+Wait-free is a stronger condition which means that every thread is guaranteed to make progress in a bounded amount of time. No starvation essentially. Threads need to collaborate to allow each other to complete their operations. Due to this algorithm is likely to be more complex.
+
+Because there aren’t any locks, deadlocks are impossible with lock-free data structures, although there is the possibility of live locks instead. By  definition,  wait-free
+code can’t suffer from live lock because there’s always an upper limit on the number
+of  steps  needed  to  perform  an  operation.  
 
 All wait-free programs are lock-free.
 
