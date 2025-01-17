@@ -89,6 +89,8 @@ Submaps support intrinsic parallelism and allow more fine-grained control than a
 Planning to prototype a lock-free hashtable using atomic shared pointers based on :
 
 - A.A and M.M's paper (saved in directory)
+- A.A's paper (saved in directory)
+- https://melodiessim.netlify.app/intro-hazard-ptrs/
 - https://ssteinberg.xyz/2015/09/28/designing-a-lock-free-wait-free-hash-map/
 
 **Next target**
