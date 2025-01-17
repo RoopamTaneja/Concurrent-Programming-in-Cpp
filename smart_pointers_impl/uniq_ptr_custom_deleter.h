@@ -19,11 +19,16 @@
 
 // The DefaultDeleter is an empty non-final class so it is benefitted from this.
 
+// C++20 onwards, we can use [[no_unique_address]] attribute to avoid storing empty member subobject
+// This allows us to avoid the inheritance and code duplication while still saving memory
+// This is shown in comments below.
+
 #pragma once
 
 #include <utility>
 namespace my_uniq
 {
+    // pre-C++20:
     template <typename T, typename Del, bool hasEmptyBase = std::is_empty_v<Del> && !std::is_final_v<Del>>
     struct compressed_pair
     {
@@ -44,6 +49,18 @@ namespace my_uniq
         T *first() { return ptr; }
         Del &second() { return *this; }
     };
+
+    // C++20 onwards:
+    // template <typename T, typename Del>
+    // struct compressed_pair
+    // {
+    //     T *ptr{};
+    //     [[no_unique_address]] Del deleter{};
+    //     compressed_pair() = default;
+    //     compressed_pair(T *p, Del d = Del{}) : ptr{p}, deleter{std::move(d)} {}
+    //     T *first() { return ptr; }
+    //     Del &second() { return deleter; }
+    // };
 
     template <typename T>
     struct DefaultDeleter

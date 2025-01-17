@@ -15,12 +15,13 @@ Currently includes :
 - Lock-free implementations (particularly using atomic_shared_pointers):
   - Treiber stack
   - Michael-Scott queue
+- A small description about some of existing concurrent hash table implementations
 
-Note : A lot of sources (including gen AI) have been referred for learning and creating the material and code in this repository. The aim was entirely to facilitate learning and no commercial benefit or copyright violation is intended. It won't be possible to cite them all but some of them are mentioned below.
+Note : A lot of sources (including gen AI) have been referred for learning and creating the material and code in this repository. The aim was entirely to facilitate learning and no commercial benefit or copyright violation is intended. It won't be possible to mention them all but some of them are cited in the respective articles and below.
 
 ### Key References 
 
-1. Concurrency in Action book by Anthony Williams
+1. C++ Concurrency in Action book by Anthony Williams
 2. [Daniel's CppCon 2023 Talk](https://www.youtube.com/watch?v=lNPZV9Iqo3U)
 3. [Fedor's CppCon 2017 Talk](https://www.youtube.com/watch?v=ZQFzMfHIxng)
 4. [Timur's CppCon 2022 Talk](https://www.youtube.com/watch?v=gTpubZ8N0no)

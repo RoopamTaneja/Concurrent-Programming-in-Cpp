@@ -42,8 +42,53 @@ The first element will continue to act as a dummy node. Any nodes enqueued come 
 
 ## Lock-free ring buffer
 
-Next target.
+**Next target**
 
-## Concurrent hashmap
+## Concurrent hash table
 
-A rabbit-hole for some other day.
+**A small survey of some existing concurrent hash tables:**
+
+### Intel TBB
+
+They have a lock-based hash table based on separate chaining where a lock is held per bucket.
+
+### libcuckoo
+
+It is a concurrent hash table developed by CMU based on optimistic cuckoo hashing which allows concurrent reads without locking.
+
+Below I present my summary of their original design from their paper : [NSDI 2013](https://www.cs.cmu.edu/~dga/papers/memc3-nsdi2013.pdf) 
+
+They improved naive cuckoo hashing and made a 4-way set associative hash table, ie each bucket can store pointers to 4 (key, value) pairs to allow more occupancy before a rehash.
+
+To reduce no of pointer dereferences, they use the metadata trick. It stores one byte hash of key as a metadata tag beside the pointer. Only those pointers with matching tag are dereferenced hence reducing the no of main memory accesses (on average it turns out to be a little over one access for a successful lookup). The 4-way buckets anyway fit into a single cache line. 
+
+For concurrent access :
+
+They simplify things by allowing only one writer at a time. We have a lock on insert() which serializes multiple writers. Thus it is a multi-reader, single-writer table with brilliant speedup for read-heavy workloads.
+
+insert() is broken into a series of displacements. Instead of making whole sequence atomic (with a global lock), we can choose to make individual displacements atomic. During forward propagation of keys, one key is "floating" (not part of any bucket) between two displacements and a find() will return false. The paper has an ingenious solution for these false misses. It separates searching for cuckoo path of displacements from propagation. Once a hole is found, displacements are done in reverse ie hole is propagated backwards. 
+
+This has two benefits : pulls searching for path out of critical section; and there are no floating keys so no issue of false misses.
+
+find() interleaving with insert() can also be used with locks on two buckets involved in an atomic displacement. However paper chooses to use optimistic concurrency control in form of versioning where find() will check version numbers before and after reading to detect any concurrent displacement. Another optimization by paper is to use lock striping ie instead of a version counter with each (key, value) pair, a separate smaller array of counters is maintained to which different keys will hash to. The size should be small enough for cache locality and low overhead but large enough to minimize false positives due to collisions. The counters must be updated atomically.
+
+Later they adapted the design for multiple readers/writers as well. Details : [EuroSys 2014](https://www.cs.princeton.edu/~mfreed/docs/cuckoo-eurosys14.pdf)
+
+### parallel-hashmap
+
+Developed by Gregory Popovitch. It builds from [Google's Abseil containers](https://abseil.io/docs/cpp/guides/container) hence uses open addressing along with SSE instructions. 
+
+It modifies the aforementioned containers by internally maintaining an array of hashmaps (submaps) of size power of two. This allows lower peak memory usage and also supports concurrent access.
+
+Concurrent access : 
+
+Submaps support intrinsic parallelism and allow more fine-grained control than a lock on the whole table. The library chooses to have an internal mutex for each submap and benchmarks reveal a speedup compared to single-threaded insertion.
+
+### Lock-free?
+
+Planning to prototype a lock-free hashtable using atomic shared pointers based on :
+
+- A.A and M.M's paper (saved in directory)
+- https://ssteinberg.xyz/2015/09/28/designing-a-lock-free-wait-free-hash-map/
+
+**Next target**
